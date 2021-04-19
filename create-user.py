@@ -124,7 +124,9 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(201)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write(bytes("SECRET: %s" % SECRET, 'UTF-8'))
+            QR = '<img src=https://chart.googleapis.com/chart?chs=200x200&chld=M%7C0&cht=qr&chl=otpauth://totp/test@test%3Fsecret='+str(SECRET)+'>TOTP SECRET: '+str(SECRET)+'</img>'
+            self.wfile.write(bytes(QR, 'UTF-8'))
+            #self.wfile.write(bytes("SECRET: %s" % SECRET, 'UTF-8'))
             return
                 
         # Otherwise return 404

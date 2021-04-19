@@ -1,0 +1,28 @@
+version: "3.3"
+services:
+  nginx:
+    image: nginx:1.15-alpine
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./vhost.conf:/etc/nginx/conf.d/vhost.conf
+  simpleotp:
+    build: 
+      dockerfile: Dockerfile
+    command:
+      - python3
+      - main.py
+    volumes:
+      - ./main.py:/main.py 
+      - ./totp:/totp
+  simpleotp-2:
+    build: 
+      dockerfile: Dockerfile
+    command:
+      - python3
+      - main.py
+    volumes:
+      - ./create-user.py:/main.py 
+      - ./totp:/totp
+

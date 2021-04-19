@@ -4,6 +4,7 @@ import socketserver
 import random
 import time
 from urllib.parse import parse_qs
+import urllib.parse as urlparse
 from cgi import parse_header, parse_multipart
 import hashlib
 
@@ -122,10 +123,8 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             self.headers.get('Referer')
-            logger.info(self.headers.get('Referer'))
             referer=self.headers.get('Referer')
         except:
-            logger.info('no referer')
             referer='/auth/login'
         if '/auth/login' in self.path:
             # Rate limit login attempts to once per second
@@ -139,7 +138,6 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
 
             # Check the TOTP Secret
             params = self.parse_POST()
-            logger.info(params)
             PASSWORDFILE = PATH + ".password_" + params.get(b'user')[0].decode() + "_secret"
             try: 
                 PASSWORD = open(PASSWORDFILE).read().strip()
@@ -177,17 +175,13 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
                 cookie["token"]["path"] = "/"
                 cookie["token"]["secure"] = True
 
-                query_components = parse_qs(urlparse(self.path).query)
-                full_path="https://" + self.headers.get('Host') + origin_path
-                logger.info(full_path)
-
-                origin_path=query_components["orig_path"]
+                logger.info("Check query components")
 
                 try:
-                    query_components = parse_qs(urlparse(self.path).query)
-                    
-                    origin_path=query_components["orig_path"]
-                    full_path="https://" + self.headers.get('Host') + origin_path
+                    query_components = urlparse.urlparse(referer)
+                    origin_path=parse_qs(query_components.query)['orig_path']
+                    orig_host='{uri.scheme}://{uri.netloc}'.format(uri=urlparse.urlparse(referer))
+                    full_path = orig_host + origin_path[0]
 
                     self.send_response(302)
                     self.send_header('Set-Cookie', cookie.output(header=''))
