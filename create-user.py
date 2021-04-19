@@ -8,6 +8,8 @@ from cgi import parse_header, parse_multipart
 import hashlib
 import os
 
+import pyqrcode
+
 import base64
 import pyotp
 
@@ -124,7 +126,9 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(201)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write(bytes("SECRET: %s" % SECRET, 'UTF-8'))
+            QR=pyqrcode.create(SECRET)
+            PAGE="<img title='" + SECRET + "' style='display:block; width:500px;height:500px;' id='base64image' src='data:image/png;base64, " + QR.png_as_base64_str(scale=8) + "' /><br/> SECRET : " + SECRET 
+            self.wfile.write(bytes(PAGE, 'UTF-8'))
             return
                 
         # Otherwise return 404

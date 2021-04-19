@@ -8,7 +8,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get install -y python3 python3-pip tzdata
 
-RUN pip3 install pyotp
+RUN pip3 install pyotp pyqrcode pypng
 
 COPY main.py /main.py
 
