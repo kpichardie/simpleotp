@@ -45,7 +45,7 @@ FORM = """
 AUTH GEN
 <form action="/auth/gen" method="POST">
 USER <input type="text" name="user">
-PASS <input type="text" type="password" name="password">
+PASS <input type="password" name="password">
 <input type="submit" value="Submit">
 </form>
 </body>

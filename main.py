@@ -43,7 +43,7 @@ FORM = """
 LOGIN
 <form action="/auth/login" method="POST">
 USER <input type="text" name="user">
-PASS <input type="text" type="password" name="password">
+PASS <input type="password" name="password">
 TOKEN OTP <input type="text" name="token">
 <input type="submit" value="Submit">
 </form>
