@@ -30,6 +30,9 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
+#COOKIEARREA="origindomain"
+#COOKIEARREA="mydomain.fr"
+COOKIEARREA="currentdomain"  # default behavior
 PATH="/totp/"
 PORT = 8000
 TOKEN_LIFETIME = 60 * 60 * 24
@@ -170,10 +173,27 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 return
             if (params.get(b'token') or [None])[0] == bytes(pyotp.TOTP(SECRET).now(), 'UTF-8'):
-                cookie = http.cookies.SimpleCookie()
-                cookie["token"] = TOKEN_MANAGER.generate()
-                cookie["token"]["path"] = "/"
-                cookie["token"]["secure"] = True
+                global COOKIEARREA
+                if (COOKIEARREA == "origindomain"):
+                   origin=self.headers.get('Origin')
+                   separator="."
+                   domain=separator.join(origin.split(".")[-2:])
+                   cookie = http.cookies.SimpleCookie()
+                   cookie["token"] = TOKEN_MANAGER.generate()
+                   cookie["token"]["domain"] = domain
+                   cookie["token"]["path"] = "/"
+                   cookie["token"]["secure"] = True
+                elif (COOKIEARREA != "currentdomain"):
+                   cookie = http.cookies.SimpleCookie()
+                   cookie["token"] = TOKEN_MANAGER.generate()
+                   cookie["token"]["domain"] = COOKIEARREA
+                   cookie["token"]["path"] = "/"
+                   cookie["token"]["secure"] = True
+                else:
+                   cookie = http.cookies.SimpleCookie()
+                   cookie["token"] = TOKEN_MANAGER.generate()
+                   cookie["token"]["path"] = "/"
+                   cookie["token"]["secure"] = True
 
                 logger.info("Check query components")
 

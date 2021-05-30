@@ -51,6 +51,13 @@ server {
 ```
 python3 -c "import pyotp; print(pyotp.random_base32())" > .totp_secret
 ```
+## Configuration
+
+COOKIEARREA has 3 modes possible : 
+
+ * Default mode with value `currentdomain` : Allow Cookie only for current website
+ * Mode SSO defined with value `mydomain.fr` : Allow Cookie for the whole domain and subdomains
+ * Mode SSO origin with value `origindomain` : Allow Cookie to be set to current origin. If I login on test.mydomain.fr, token will be for *.mydomain.fr. Then if I login to test.mydomain2.fr then a new token will be set for *.mydomain2.fr no matter which domain I use.
 
 ## FAQ
 
