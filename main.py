@@ -43,13 +43,40 @@ FORM = """
 <title>Please Log In</title>
 </head>
 <body>
-LOGIN
+<div style="background-color: #333;width: 100%;height: 100%;position: absolute;top: 0px;left: 0px;">
+<div style="background-color: #09F;color: white;font-size: 4em;font-style: italic;font-family: 'Open Sans';padding:0,75em;/* position: absolute; */top: 0px;left: 0px;width:100%;box-shadow: 2px 2px 3px #333;padding: 0.35em;" >
+LOGIN SIMPLEOTP
+</div>
+<div style="background-color: #333; font-size: 3em;color: white;margin-top: 1em;margin-left: 1em;">
 <form action="/auth/login" method="POST">
+<div style="background-color: #333; font-size: 1em;color: white;margin-top: 1em;margin-left: 2em;">
 USER <input type="text" name="user">
+</div>
+<div style="background-color: #333; font-size: 1em;color: white;margin-top: 1em;margin-left: 2em;">
 PASS <input type="password" name="password">
+</div>
+<div style="background-color: #333; font-size: 1em;color: white;margin-top: 1em;margin-left: 2em;">
 TOKEN OTP <input type="text" name="token">
-<input type="submit" value="Submit">
+</div>
+<div style="background-color: #333; font-size: 1em;color: white;margin-top: 1em;margin-left: 2em;padding-left: 3em;">
+<input type="submit" value="Submit" style="box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:linear-gradient(to bottom, #ededed 5%, #dfdfdf 100%);
+	background-color:#ededed;
+	border-radius:6px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	cursor:pointer;
+	color:#777777;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #ffffff;">
+</div>
 </form>
+</div>
+</div>
 </body>
 </html>
 """
