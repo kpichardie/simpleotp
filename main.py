@@ -232,7 +232,10 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
 
                     self.send_response(302)
                     self.send_header('Set-Cookie', cookie.output(header=''))
-                    self.send_header('Location', full_path)
+                    if full_path == "auth/login?orig_path=/":
+                        self.send_header('Location', '/')
+                    else:
+                        self.send_header('Location', full_path)
                     self.end_headers()
                     logger.info("sucess login %s" % params.get(b'user')[0].decode())
                     return
