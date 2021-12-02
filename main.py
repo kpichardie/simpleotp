@@ -237,14 +237,14 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
                     else:
                         self.send_header('Location', full_path)
                     self.end_headers()
-                    logger.info("sucess login %s" % params.get(b'user')[0].decode())
+                    logger.info("success login %s" % params.get(b'user')[0].decode())
                     return
                 except: 
                     self.send_response(302)
                     self.send_header('Set-Cookie', cookie.output(header=''))
                     self.send_header('Location', '/')
                     self.end_headers()
-                    logger.info("sucess login %s" % params.get(b'user')[0].decode())
+                    logger.info("success login %s" % params.get(b'user')[0].decode())
                     return
 
 
