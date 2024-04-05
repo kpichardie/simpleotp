@@ -9,6 +9,7 @@ services:
       - ./vhost.conf:/etc/nginx/conf.d/vhost.conf
   simpleotp:
     build: 
+      context: ./
       dockerfile: Dockerfile
     command:
       - python3
@@ -18,6 +19,7 @@ services:
       - ./totp:/totp
   simpleotp-2:
     build: 
+      context: ./
       dockerfile: Dockerfile
     command:
       - python3
@@ -25,4 +27,18 @@ services:
     volumes:
       - ./create-user.py:/main.py 
       - ./totp:/totp
-
+  simpleotp-3:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    command:
+      - python3
+      - main.py
+    user: "1000"
+    volumes:
+      - ./agent.py:/main.py 
+      - ./agent-cli.py:/main-cli.py 
+      - ./otpgen.js:/otpgen.js:ro
+      - ./totp:/totp
+      - /home/user/.gnupg/:/home/.gnupg/:rw
+      - /run/user/1000/gnupg/:/run/user/0/gnupg/:ro
