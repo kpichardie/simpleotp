@@ -17,6 +17,14 @@ In this case, the auth endpoint is reverse proxied to the simple script in this 
 
 Agent goal is to be able to store secrets MFA otp and generate otp codes. Two modes are available, web and cli. First generate gpgkey to encrypt/decrypt secrets. 
 
+Screenshots: 
+
+- List page : 
+![ScreenShot](https://raw.github.com/kpichardie/simpleotp/master/Screenshots/List-page.png)
+
+- Add page : 
+![ScreenShot](https://raw.github.com/kpichardie/simpleotp/master/Screenshots/Add-page.png)
+
 _Configuration :_
 gpgrecipient = 'mygpgkey@local'
 
