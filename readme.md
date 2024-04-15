@@ -20,10 +20,10 @@ Agent goal is to be able to store secrets MFA otp and generate otp codes. Two mo
 Screenshots: 
 
 - List page : 
-![ScreenShot](https://raw.github.com/kpichardie/simpleotp/master/Screenshots/List-page.png)
+![ScreenShot](https://github.com/kpichardie/simpleotp/blob/1e4629a0496f9d79a51c81bf773ffd43ace756e9/Screeshots/List-page.png)
 
 - Add page : 
-![ScreenShot](https://raw.github.com/kpichardie/simpleotp/master/Screenshots/Add-page.png)
+![ScreenShot](https://github.com/kpichardie/simpleotp/blob/1e4629a0496f9d79a51c81bf773ffd43ace756e9/Screeshots/Add-page.png)
 
 _Configuration :_
 gpgrecipient = 'mygpgkey@local'
