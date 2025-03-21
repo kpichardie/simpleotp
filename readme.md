@@ -52,6 +52,7 @@ optional arguments:
   -h, --help         show this help message and exit
   --command command  Available cli commands (list, get, add)
   --name name        Name of the otp
+  --mode json        Output mode raw/json default json
   --options options  Options for add otp default="digits=6,digest=None,name=None,issuer=None,interval=30"
 ```
 

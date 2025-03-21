@@ -36,6 +36,9 @@ def collect_args():
     parser.add_argument('--options', metavar='options', type=str,
                         default="digits=6,digest=None,name=None,issuer=None,interval=30",
                         help='Options for add otp default="digits=6,digest=None,name=None,issuer=None,interval=30"')
+    parser.add_argument('--mode', metavar='mode', type=str,
+                        default="json",
+                        help='Print mode "raw" or "json"')
     return parser
 
 
@@ -93,7 +96,15 @@ def get(args):
       print("Wrong passkey or unable to decrypt")
       return
   left = totp.interval - datetime.datetime.now().timestamp() % totp.interval
-  TOKEN = {"token": totp.now(), "timeleft": left}
+  TEMP_TOTP = open(PATH + '.totp_secret_totplast',"w")
+  TOKEN_TOTP=totp.now()
+  TEMP_TOTP.write(TOKEN_TOTP)
+  print("Saved to clipboard")
+  if "mode" in args:
+    if args.mode == "raw":
+      TOKEN=TOKEN_TOTP 
+    else:
+      TOKEN = {"token": TOKEN_TOTP, "timeleft": left}
   print(TOKEN)
   return 
 
@@ -144,6 +155,3 @@ if __name__ == '__main__':
        add()
     if args.command == "get":
        get(args)
-
-
-
