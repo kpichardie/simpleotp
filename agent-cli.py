@@ -10,6 +10,7 @@ import gnupg
 import pyqrcode
 import qrtools
 import datetime
+import urllib.parse
 
 import base64
 import pyotp
@@ -134,8 +135,14 @@ def add():
   if mode == "secret":
     SECRET = secret
   elif mode == "qrcode":
-    SECRET=qr.data 
-
+    PARSE=urllib.parse.urlparse(qr.data)
+    QUERY=PARSE.query
+    for q in QUERY.split("&"):
+      var, val = q.split("=")
+      if var == "secret":
+        SECRET=val
+    # Depend on qrcode
+    #SECRET=qr.data 
   
   SEC.write(str(gpg.encrypt(SECRET,gpgrecipient,always_trust="true")))
   SEC.close()
