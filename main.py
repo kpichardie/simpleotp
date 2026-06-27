@@ -30,9 +30,7 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-#COOKIEARREA="origindomain"
-#COOKIEARREA="mydomain.fr"
-COOKIEARREA="currentdomain"  # default behavior
+COOKIEARREA="origindomain"
 PATH="/totp/"
 PORT = 8000
 TOKEN_LIFETIME = 60 * 60 * 24
@@ -159,10 +157,11 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
         if '/auth/login' in self.path:
             # Rate limit login attempts to once per second
             global LAST_LOGIN_ATTEMPT
-            if time.time() - LAST_LOGIN_ATTEMPT < 1.0:
+            if time.time() - LAST_LOGIN_ATTEMPT < 15.0:
                 self.send_response(429)
                 self.end_headers()
                 self.wfile.write(bytes('Slow down. Hold your horses', 'UTF-8'))
+                logger.warn("Slow down at %s for %s", LAST_LOGIN_ATTEMPT, self.headers.get("X-Forwarded-For"))
                 return
             LAST_LOGIN_ATTEMPT = time.time()
 
@@ -174,18 +173,21 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
             except FileNotFoundError:
                 self.send_response(302)
                 self.send_header('Location', referer)
+                logger.warn("Login failed from %s", self.headers.get("X-Forwarded-For", self.client_address[0]))
                 self.end_headers()
                 return
             SALTFILE = PATH + ".salt_" + params.get(b'user')[0].decode()
             try:
                 SALT = open(SALTFILE).read().strip()
             except FileNotFoundError:
+                logger.warn("Login failed from %s", self.headers.get("X-Forwarded-For", self.client_address[0]))
                 self.send_response(302)
                 self.send_header('Location', referer)
                 self.end_headers()
                 return
             logger.info("check login %s" % params.get(b'user')[0].decode())
             if not (hashlib.pbkdf2_hmac('sha256',params.get(b'password')[0].decode().encode('utf-8'),base64.b64decode(SALT),10000)) == base64.b64decode(PASSWORD):
+                logger.warn("Login failed from %s", self.headers.get("X-Forwarded-For", self.client_address[0]))
                 self.send_response(302)
                 self.send_header('Location', referer)
                 self.end_headers()
@@ -195,6 +197,7 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
             try:
                 SECRET = open(PATH + '.totp_' + params.get(b'user')[0].decode() + '_secret').read().strip()
             except FileNotFoundError:
+                logger.warn("Login failed from %s", self.headers.get("X-Forwarded-For", self.client_address[0]))
                 self.send_response(302)
                 self.send_header('Location', referer)
                 self.end_headers()
@@ -202,25 +205,30 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
             if (params.get(b'token') or [None])[0] == bytes(pyotp.TOTP(SECRET).now(), 'UTF-8'):
                 global COOKIEARREA
                 if (COOKIEARREA == "origindomain"):
-                   origin=self.headers.get('Origin')
-                   separator="."
-                   domain=separator.join(origin.split(".")[-2:])
-                   cookie = http.cookies.SimpleCookie()
-                   cookie["token"] = TOKEN_MANAGER.generate()
-                   cookie["token"]["domain"] = domain
-                   cookie["token"]["path"] = "/"
-                   cookie["token"]["secure"] = True
+                    origin = self.headers.get('Origin', '')
+                    if origin:
+                        netloc = origin.split('://')[-1].split(':')[0]
+                        parts = netloc.split('.')
+                        domain = '.'.join(parts[-2:]) if len(parts) >= 2 else ''
+                    else:
+                        domain = ''
+                    cookie = http.cookies.SimpleCookie()
+                    cookie["token"] = TOKEN_MANAGER.generate()
+                    if domain:
+                        cookie["token"]["domain"] = domain
+                    cookie["token"]["path"] = "/"
+                    cookie["token"]["secure"] = True
                 elif (COOKIEARREA != "currentdomain"):
-                   cookie = http.cookies.SimpleCookie()
-                   cookie["token"] = TOKEN_MANAGER.generate()
-                   cookie["token"]["domain"] = COOKIEARREA
-                   cookie["token"]["path"] = "/"
-                   cookie["token"]["secure"] = True
+                    cookie = http.cookies.SimpleCookie()
+                    cookie["token"] = TOKEN_MANAGER.generate()
+                    cookie["token"]["domain"] = COOKIEARREA
+                    cookie["token"]["path"] = "/"
+                    cookie["token"]["secure"] = True
                 else:
-                   cookie = http.cookies.SimpleCookie()
-                   cookie["token"] = TOKEN_MANAGER.generate()
-                   cookie["token"]["path"] = "/"
-                   cookie["token"]["secure"] = True
+                    cookie = http.cookies.SimpleCookie()
+                    cookie["token"] = TOKEN_MANAGER.generate()
+                    cookie["token"]["path"] = "/"
+                    cookie["token"]["secure"] = True
 
                 logger.info("Check query components")
 
@@ -230,6 +238,7 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
                     orig_host='{uri.scheme}://{uri.netloc}'.format(uri=urlparse.urlparse(referer))
                     full_path = orig_host + origin_path[0]
 
+                    logger.info("sucess login %s" % params.get(b'user')[0].decode())
                     self.send_response(302)
                     self.send_header('Set-Cookie', cookie.output(header=''))
                     if full_path == "auth/login?orig_path=/":
@@ -237,19 +246,19 @@ class AuthHandler(http.server.BaseHTTPRequestHandler):
                     else:
                         self.send_header('Location', full_path)
                     self.end_headers()
-                    logger.info("success login %s" % params.get(b'user')[0].decode())
                     return
                 except: 
+                    logger.info("sucess login %s" % params.get(b'user')[0].decode())
                     self.send_response(302)
                     self.send_header('Set-Cookie', cookie.output(header=''))
                     self.send_header('Location', '/')
                     self.end_headers()
-                    logger.info("success login %s" % params.get(b'user')[0].decode())
                     return
 
 
             # Otherwise redirect back to the login page
             else:
+                logger.warn("Login failed from %s", self.headers.get("X-Forwarded-For", self.client_address[0]))
                 self.send_response(302)
                 self.send_header('Location', referer)
                 self.end_headers()
